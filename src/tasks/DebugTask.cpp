@@ -6,8 +6,8 @@
 #include <TaskSchedulerDeclarations.h>
 
 // Libraries
-#include <SpotifyArduino.h>
 
+#include "spotify.h"
 #include "events.h"
 
 class DebugTask : public Task, public TSEvents::EventHandler {
@@ -59,9 +59,9 @@ class DebugTask : public Task, public TSEvents::EventHandler {
         M5.Display.println("Spotify auth error");
         break;
       case SPOTIFY_UPDATE: {
-        CurrentlyPlaying* cp = *(CurrentlyPlaying**)event.data;
+        SpotifyState* ss = *(SpotifyState**)event.data;
         // M5Dial.Display.println(cp->trackName);
-        Serial.println(cp->trackName);
+        Serial.println(ss->trackName);
         break;
       }
     }

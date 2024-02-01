@@ -2,7 +2,7 @@
 #define _TASK_OO_CALLBACKS
 #define _TASK_STATUS_REQUEST
 #include <EventHandler.h>
-#include <HTTPClient.h> // Needs to be before M5Dial so that drawJpgUrl is available 
+#include <HTTPClient.h>  // Needs to be before M5Dial so that drawJpgUrl is available
 #include <M5Dial.h>
 #include <TaskSchedulerDeclarations.h>
 
@@ -14,6 +14,7 @@
 #include <assets/roboto_regular_11.h>
 
 #include "events.h"
+#include "spotify.h"
 
 enum View {
   NOW_PLAYING,
@@ -43,39 +44,28 @@ class NowPlayingView : public Task, public TSEvents::EventHandler {
     if (lastProgress == 0) {
       return;
     }
-    if(cp_last.albumUri && cp.albumUri && strcmp(cp.albumUri, cp_last.albumUri) != 0) {
-      Serial.println("Album changed: ");
-      Serial.println(cp.albumUri);
-      Serial.println(cp_last.albumUri);
-      for (int i = 0; i < cp.numImages; i++) {
-        if (cp.albumImages[i].width == 300) {
-          Serial.print("Album art: ");
-          Serial.println(cp.albumImages[i].url);
-          RenderAlbumArt(cp.albumImages[i].url);
-          Serial.println("Done");
-          break;
-        }
-      }
+    if (strcmp(ss.albumId, ss_last.albumId) != 0) {
+      Serial.print("Album: ");
+      Serial.println(ss.albumName);
+      RenderAlbumArt(ss.albumArtUrl);
     }
-    // Serial.println("still alive");
-    // Serial.println(cp.trackUri == nullptr ? "<null>" : cp.trackUri);
-    // Serial.println(cp_last.trackUri == nullptr ? "<null>" : cp_last.trackUri);
-    // if (cp_last.trackUri != nullptr && cp.trackUri != nullptr && strcmp(cp.trackUri, cp_last.trackUri) != 0) {
-    //   Serial.print("Track: ");
-    //   Serial.println(cp.trackName);
-    //   RenderTrackName(cp.trackName, cp.artists[0].artistName);
-    // }
-    if (cp.durationMs != cp_last.durationMs || cp.progressMs < cp_last.progressMs) {
+    if (strcmp(ss.trackId, ss_last.trackId) != 0) {
+      Serial.print("Track: ");
+      Serial.println(ss.trackName);
+      RenderTrackName(ss.trackName, ss.artistName);
+    }
+    if (ss.durationMs != ss_last.durationMs || ss.progressMs < ss_last.progressMs) {
       Serial.print("Clearing ring");
       ClearProgressRing();
     }
-    long actualProgress = cp.progressMs;
-    if (cp.isPlaying) {
+    long actualProgress = ss.progressMs;
+    if (ss.isPlaying) {
       actualProgress += (millis() - lastProgress);
+      actualProgress = min(actualProgress, ss.durationMs);
     }
-    RenderProgressText(actualProgress, cp.durationMs);
-    RenderProgressRing(actualProgress, cp.durationMs);
-    cp_last = cp;
+    RenderProgressText(actualProgress, ss.durationMs);
+    RenderProgressRing(actualProgress, ss.durationMs);
+    ss_last = ss;
   }
 
   void RenderTrackName(const char* trackName, const char* albumName) {
@@ -94,7 +84,7 @@ class NowPlayingView : public Task, public TSEvents::EventHandler {
   }
 
   void RenderProgressText(long progressMs, long durationMs) {
-    M5Dial.Display.fillRect(88, 206, 240, 152, BLACK);
+    M5Dial.Display.fillRect(88, 206, 240-88*2, 14, BLACK);
     M5Dial.Display.setTextColor(0x9CD3);
     char text[23];
     int len = msToTime(progressMs, text);
@@ -125,8 +115,8 @@ class NowPlayingView : public Task, public TSEvents::EventHandler {
   void HandleEvent(TSEvents::Event event) {
     switch (event.id) {
       case SPOTIFY_UPDATE: {
-        CurrentlyPlaying* cp = *(CurrentlyPlaying**)event.data;
-        this->cp = *cp;
+        SpotifyState* ss = *(SpotifyState**)event.data;
+        this->ss = *ss;
         lastProgress = millis();
         break;
       }
@@ -135,8 +125,8 @@ class NowPlayingView : public Task, public TSEvents::EventHandler {
 
  private:
   long lastProgress = 0;
-  CurrentlyPlaying cp;
-  CurrentlyPlaying cp_last;
+  SpotifyState ss;
+  SpotifyState ss_last;
 };
 
 class Controller : public Task, public TSEvents::EventHandler {

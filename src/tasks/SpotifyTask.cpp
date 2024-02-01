@@ -14,6 +14,7 @@
 #include <WiFiClientSecure.h>
 
 #include "events.h"
+#include "spotify.h"
 
 #define SPOTIFY_MARKET "GB"
 
@@ -66,10 +67,10 @@ class SpotifyTask : public Task, public TSEvents::EventHandler {
     return true;
   }
 
-  void onCurrentlyPlaying(CurrentlyPlaying _currentlyPlaying) {
-    currentlyPlaying = _currentlyPlaying;
-    CurrentlyPlaying* cp = &currentlyPlaying;
-    dispatch(SPOTIFY_UPDATE, &cp, sizeof(CurrentlyPlaying*));
+  void onCurrentlyPlaying(CurrentlyPlaying &currentlyPlaying) {
+    state.setFromCurrentlyPlaying(&currentlyPlaying);
+    SpotifyState* ss = &state;
+    dispatch(SPOTIFY_UPDATE, &ss, sizeof(SpotifyState*));
   }
 
   void HandleEvent(TSEvents::Event event) {
@@ -90,6 +91,7 @@ class SpotifyTask : public Task, public TSEvents::EventHandler {
   bool authorized = false;
   WiFiClientSecure client;
   SpotifyArduino* spotify;
+  SpotifyState state;
 
   static SpotifyTask* reqInstance;
   static void handleCurrentlyPlaying(CurrentlyPlaying currentlyPlaying) {
