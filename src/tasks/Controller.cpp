@@ -108,8 +108,10 @@ class NowPlayingView : public Task, public TSEvents::EventHandler {
   }
 
   void RenderAlbumArt(const char* url) {
+    M5Dial.Display.setClipRect(34, 39, 173, 136);
     M5Dial.Display.drawJpgUrl(url, 34, 34, 172, 172, 0, 0, 0.573, 0.573);
     M5Dial.Display.fillArc(120, 120, 86, 105, 0, 360, BLACK);
+    M5Dial.Display.clearClipRect();
   }
 
   void HandleEvent(TSEvents::Event event) {
