@@ -1,0 +1,7 @@
+{
+  "wifiSSID": "SSID",
+  "wifiPass": "PASS",
+  "spotifyClientId": "clientId",
+  "spotifyClientSecret": "clientSecret",
+  "spotifyRefreshToken": "refreshToken"
+}
