@@ -88,6 +88,7 @@ class WifiTask : public Task, public TSEvents::EventHandler {
     }
     int32_t channel = WiFi.channel(apIndex);
     uint8_t* bssid = WiFi.BSSID(apIndex);
+    // TODO: figure out why this doesn't work without static configuration
     WiFi.config(IPAddress(192, 168, 50, 203), IPAddress(192, 168, 50, 1), IPAddress(255, 255, 255, 0), IPAddress(192, 168, 50, 3));
     WiFi.begin(ssid, pass, channel, bssid, true);
     state = CONNECTING;

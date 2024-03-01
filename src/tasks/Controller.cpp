@@ -20,11 +20,20 @@ enum View {
   NOW_PLAYING,
 };
 
-class NowPlayingView : public Task, public TSEvents::EventHandler {
+class ViewTask : public Task {
+  public:
+    ViewTask(Scheduler& s, uint8_t fps) : Task(1000 * TASK_MILLISECOND / fps, TASK_FOREVER, &s, false) {
+    }
+
+    // View tasks will get their event sent to them by the controller when they are active,
+    // rather than directly from the event bus, which would occur even when they are not active.
+    virtual void HandleEvent(TSEvents::Event event) {}
+};
+
+class NowPlayingView : public ViewTask {
  public:
   NowPlayingView(Scheduler& s, TSEvents::EventBus& e)
-      : Task(200 * TASK_MILLISECOND, TASK_FOREVER, &s, false),
-        TSEvents::EventHandler(&s, &e) {
+      : ViewTask(s, 5) {
   }
 
   bool OnEnable() {
@@ -153,6 +162,7 @@ class Controller : public Task, public TSEvents::EventHandler {
   }
 
   void HandleEvent(TSEvents::Event event) {
+    viewTask->HandleEvent(event);
     switch (event.id) {
     }
   }
@@ -174,7 +184,7 @@ class Controller : public Task, public TSEvents::EventHandler {
 
  private:
   View view = NOW_PLAYING;
-  Task* viewTask = NULL;
+  ViewTask* viewTask = NULL;
 
   // Views
   NowPlayingView* nowPlayingView;
