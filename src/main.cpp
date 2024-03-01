@@ -25,7 +25,7 @@ Controller *controllerTask;
 
 void setup() {
   Serial.begin(115200);
-  M5Dial.begin();
+  M5Dial.begin(true, false);
 
   M5Dial.Display.setTextColor(GREEN);
   M5Dial.Display.setTextDatum(top_centre);
