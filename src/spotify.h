@@ -5,6 +5,7 @@
 #include "utils.h"
 
 typedef struct {
+  // Currently Playing
   char trackName[32];
   char trackId[8];
   char artistName[32];
@@ -14,6 +15,10 @@ typedef struct {
   bool isPlaying;
   long progressMs;
   long durationMs;
+  // Active Device
+  char deviceName[32];
+  char deviceType[16];
+  int volumePercent;
 
   void setFromCurrentlyPlaying(CurrentlyPlaying* cp) {
     strncpynt(trackName, cp->trackName, 32);
@@ -30,5 +35,13 @@ typedef struct {
     isPlaying = cp->isPlaying;
     progressMs = cp->progressMs;
     durationMs = cp->durationMs;
+  }
+
+  void setFromPlayerDetails(PlayerDetails* pd) {
+    strncpynt(deviceName, pd->device.name, 32);
+    strncpynt(deviceType, pd->device.type, 16);
+    volumePercent = pd->device.volumePercent;
+    isPlaying = pd->isPlaying;
+    progressMs = pd->progressMs;
   }
 } SpotifyState;
