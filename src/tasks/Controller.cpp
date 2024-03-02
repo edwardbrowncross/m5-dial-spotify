@@ -28,6 +28,12 @@ class ViewTask : public Task {
     // View tasks will get their event sent to them by the controller when they are active,
     // rather than directly from the event bus, which would occur even when they are not active.
     virtual void HandleEvent(TSEvents::Event event) {}
+  protected:
+    static const uint32_t COL_GREEN = 0x17A443; //0x1DB954;
+    static const uint32_t COL_TEXT = 0xFFFFFF;
+    static const uint32_t COL_BG = 0x000000;
+    static const uint32_t COL_TEXT_SUBTLE = 0x505050;
+    static const uint32_t COL_RING_BG = 0x1A1A1A;
 };
 
 class NowPlayingView : public ViewTask {
@@ -37,7 +43,7 @@ class NowPlayingView : public ViewTask {
   }
 
   bool OnEnable() {
-    M5.Display.fillScreen(BLACK);
+    M5.Display.fillScreen(COL_BG);
     return true;
   }
 
@@ -47,7 +53,7 @@ class NowPlayingView : public ViewTask {
   }
 
   void Render() {
-    M5Dial.Display.setTextColor(WHITE);
+    M5Dial.Display.setTextColor(COL_TEXT);
     M5Dial.Display.setTextDatum(bottom_center);
     M5Dial.Display.drawString("Now Playing", 120, 35, &Roboto_Regular11pt7b);
     if (lastProgress == 0) {
@@ -78,8 +84,8 @@ class NowPlayingView : public ViewTask {
   }
 
   void RenderTrackName(const char* trackName, const char* albumName) {
-    M5Dial.Display.fillRect(0, 175, 240, 29, BLACK);
-    M5Dial.Display.setTextColor(WHITE);
+    M5Dial.Display.fillRect(0, 175, 240, 29, COL_BG);
+    M5Dial.Display.setTextColor(COL_TEXT);
     M5Dial.Display.drawString(trackName, 120, 188, &Roboto_Regular11pt7b);
     M5Dial.Display.setTextColor(0xC638);
     M5Dial.Display.drawString(albumName, 120, 202, &Roboto_Regular11pt7b);
@@ -93,8 +99,8 @@ class NowPlayingView : public ViewTask {
   }
 
   void RenderProgressText(long progressMs, long durationMs) {
-    M5Dial.Display.fillRect(88, 206, 240-88*2, 14, BLACK);
-    M5Dial.Display.setTextColor(0x9CD3);
+    M5Dial.Display.fillRect(88, 206, 240-88*2, 14, COL_BG);
+    M5Dial.Display.setTextColor(COL_TEXT_SUBTLE);
     char text[23];
     int len = msToTime(progressMs, text);
     sprintf(text + len, " / ");
@@ -105,21 +111,21 @@ class NowPlayingView : public ViewTask {
   }
 
   void ClearProgressRing() {
-    M5Dial.Display.fillArc(120, 120, 103, 121, 0, 360, BLACK);
-    M5Dial.Display.fillArc(120, 120, 104, 120, 0, 360, (uint32_t)0x3F3F3F);
-    M5Dial.Display.fillCircle(120, 8, 8, (uint32_t)0x1DB954);
+    M5Dial.Display.fillArc(120, 120, 103, 121, 0, 360, COL_BG);
+    M5Dial.Display.fillArc(120, 120, 104, 120, 0, 360, COL_RING_BG);
+    M5Dial.Display.fillCircle(120, 8, 8, COL_GREEN);
   }
 
   void RenderProgressRing(long progressMs, long durationMs) {
     float angle = (progressMs / (float)durationMs) * 360 - 90;
-    M5Dial.Display.fillArc(120, 120, 104, 120, -90, angle, (uint32_t)0x1DB954);
-    M5Dial.Display.fillCircle(120 + 112 * cos(angle * PI / 180), 120 + 112 * sin(angle * PI / 180), 8, (uint32_t)0x1DB954);
+    M5Dial.Display.fillArc(120, 120, 104, 120, -90, angle, COL_GREEN);
+    M5Dial.Display.fillCircle(120 + 112 * cos(angle * PI / 180), 120 + 112 * sin(angle * PI / 180), 8, COL_GREEN);
   }
 
   void RenderAlbumArt(const char* url) {
-    M5Dial.Display.setClipRect(34, 39, 173, 136);
+    M5Dial.Display.setClipRect(34, 39, 173, 132);
     M5Dial.Display.drawJpgUrl(url, 34, 34, 172, 172, 0, 0, 0.573, 0.573);
-    M5Dial.Display.fillArc(120, 120, 86, 105, 0, 360, BLACK);
+    M5Dial.Display.fillArc(120, 120, 86, 105, 0, 360, COL_BG);
     M5Dial.Display.clearClipRect();
   }
 
