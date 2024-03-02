@@ -6,6 +6,7 @@
 #include <TaskSchedulerDeclarations.h>
 
 #include "events.h"
+#include "encoder.h"
 
 class InputTask : public Task, public TSEvents::EventEmitter {
  public:
@@ -15,6 +16,7 @@ class InputTask : public Task, public TSEvents::EventEmitter {
   }
 
   bool OnEnable() {
+    init_encoder();
     return true;
   }
 
@@ -40,9 +42,10 @@ class InputTask : public Task, public TSEvents::EventEmitter {
     }
     
     // Dial handling
-    long position = M5Dial.Encoder.read();
+    // long position = M5Dial.Encoder.read();
+    int16_t position = get_encoder();
     if (position != lastPosition) {
-      long delta = position - lastPosition;
+      int16_t delta = position - lastPosition;
       dispatch(DIAL_MOVE, &delta, sizeof(delta));
       lastPosition = position;
     }
@@ -52,5 +55,5 @@ class InputTask : public Task, public TSEvents::EventEmitter {
   private:
     bool buttonPressed = false;
     ulong lastButtonPress = 0;
-    long lastPosition = 0;
+    int16_t lastPosition = 0;
 };

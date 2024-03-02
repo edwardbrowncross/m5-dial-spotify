@@ -13,6 +13,7 @@
 #include "tasks/WifiTask.cpp"
 #include "tasks/DebugTask.cpp"
 #include "tasks/Controller.cpp"
+#include "tasks/InputTask.cpp"
 
 Scheduler ts;
 TSEvents::EventBus e;
@@ -21,11 +22,12 @@ SpotifyTask *spotifyTask;
 SpotifyTask* SpotifyTask::reqInstance;
 WifiTask *wifiTask;
 DebugTask *debugTask;
+InputTask *inputTask;
 Controller *controllerTask;
 
 void setup() {
   Serial.begin(115200);
-  M5Dial.begin(true, false);
+  M5Dial.begin(false, false); // Encoder is disabled as it is handled by custom driver (due to bug in M5Dial library)
 
   M5Dial.Display.setTextColor(GREEN);
   M5Dial.Display.setTextDatum(top_centre);
@@ -45,6 +47,7 @@ void setup() {
 
   debugTask = new DebugTask(ts, e);
   wifiTask = new WifiTask(ts, e, getConfigValue("wifiSSID"), getConfigValue("wifiPass"));
+  inputTask = new InputTask(ts, e);
 
   spotifyTask = new SpotifyTask(ts, e, getConfigValue("spotifyClientId"), getConfigValue("spotifyClientSecret"), getConfigValue("spotifyRefreshToken"));
   controllerTask = new Controller(ts, e);
@@ -52,6 +55,7 @@ void setup() {
   debugTask->enable();
   wifiTask->enable();
   spotifyTask->enable();
+  inputTask->enable();
   controllerTask->enable();
 }
 
