@@ -502,11 +502,11 @@ bool SpotifyArduino::transferPlayback(const char *deviceId, bool play)
 
 int SpotifyArduino::getCurrentlyPlaying(processCurrentlyPlaying currentlyPlayingCallback, const char *market)
 {
-    char command[75] = SPOTIFY_CURRENTLY_PLAYING_ENDPOINT;
+    char command[100] = SPOTIFY_PLAYER_ENDPOINT;
     if (market[0] != 0)
     {
-        char marketBuff[15];
-        sprintf(marketBuff, "&market=%s", market);
+        char marketBuff[30];
+        sprintf(marketBuff, "?market=%s", market);
         strcat(command, marketBuff);
     }
 
