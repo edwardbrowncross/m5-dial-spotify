@@ -538,7 +538,7 @@ int SpotifyArduino::getCurrentlyPlaying(processCurrentlyPlaying currentlyPlaying
         CurrentlyPlaying current;
 
         //Apply Json Filter: https://arduinojson.org/v6/example/filter/
-        StaticJsonDocument<464> filter;
+        StaticJsonDocument<512> filter;
         filter["is_playing"] = true;
         filter["currently_playing_type"] = true;
         filter["progress_ms"] = true;
@@ -571,6 +571,11 @@ int SpotifyArduino::getCurrentlyPlaying(processCurrentlyPlaying currentlyPlaying
         filter_item_images_0["height"] = true;
         filter_item_images_0["width"] = true;
         filter_item_images_0["url"] = true;
+
+        JsonObject filter_device = filter.createNestedObject("device");
+        filter_device["name"] = true;
+        filter_device["type"] = true;
+        filter_device["volume_percent"] = true;
 
         // Allocate DynamicJsonDocument
         DynamicJsonDocument doc(bufferSize);
@@ -715,6 +720,10 @@ int SpotifyArduino::getCurrentlyPlaying(processCurrentlyPlaying currentlyPlaying
                     current.albumImages[i].url = images[adjustedIndex]["url"].as<const char *>();
                 }
             }
+
+            current.deviceName = doc["device"]["name"].as<const char *>();
+            current.deviceType = doc["device"]["type"].as<const char *>();
+            current.volumePercent = doc["device"]["volume_percent"].as<int>();
 
             currentlyPlayingCallback(current);
         }

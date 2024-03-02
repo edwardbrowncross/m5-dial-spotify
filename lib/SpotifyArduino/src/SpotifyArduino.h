@@ -161,6 +161,9 @@ struct CurrentlyPlaying
   long durationMs;
   const char *contextUri;
   SpotifyPlayingType currentlyPlayingType;
+  const char *deviceName;
+  const char *deviceType;
+  int volumePercent;
 };
 
 typedef void (*processCurrentlyPlaying)(CurrentlyPlaying currentlyPlaying);

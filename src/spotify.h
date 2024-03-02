@@ -35,6 +35,10 @@ typedef struct {
     isPlaying = cp->isPlaying;
     progressMs = cp->progressMs;
     durationMs = cp->durationMs;
+    // Added to CurrentlyPlaying by me in vendored SpotifyArduino
+    strncpynt(deviceName, cp->deviceName, 32);
+    strncpynt(deviceType, cp->deviceType, 16);
+    volumePercent = cp->volumePercent;
   }
 
   void setFromPlayerDetails(PlayerDetails* pd) {
